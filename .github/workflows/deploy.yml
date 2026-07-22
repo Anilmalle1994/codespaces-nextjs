@@ -34,3 +34,12 @@ jobs:
           git add --all
           git commit -m "Deploy to gh-pages: ${GITHUB_SHA}"
           git push --force "https://${GITHUB_ACTOR}:${GITHUB_TOKEN}@github.com/${{ github.repository }}.git" gh-pages:gh-pages
+      - name: Configure GitHub Pages source
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          curl -s -X PUT "https://api.github.com/repos/${GITHUB_REPOSITORY}/pages" \
+            -H "Accept: application/vnd.github+json" \
+            -H "Authorization: Bearer ${GITHUB_TOKEN}" \
+            -H "Content-Type: application/json" \
+            -d '{"source": {"branch": "gh-pages", "path": "/"}}'
