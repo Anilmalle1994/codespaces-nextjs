@@ -20,26 +20,9 @@ jobs:
           node-version: 22
       - run: npm ci
       - run: npm run build
-      - name: Deploy to gh-pages branch
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          set -e
-          git config --global user.name "github-actions[bot]"
-          git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          cd out
-          git init
-          git remote add origin "https://github.com/${{ github.repository }}.git"
-          git checkout -b gh-pages
-          git add --all
-          git commit -m "Deploy to gh-pages: ${GITHUB_SHA}"
-          git push --force "https://${GITHUB_ACTOR}:${GITHUB_TOKEN}@github.com/${{ github.repository }}.git" gh-pages:gh-pages
-      - name: Configure GitHub Pages source
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          curl -s -X PUT "https://api.github.com/repos/${GITHUB_REPOSITORY}/pages" \
-            -H "Accept: application/vnd.github+json" \
-            -H "Authorization: Bearer ${GITHUB_TOKEN}" \
-            -H "Content-Type: application/json" \
-            -d '{"source": {"branch": "gh-pages", "path": "/"}}'
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v1
+        with:
+          path: out
+      - name: Deploy to GitHub Pages
+        uses: actions/deploy-pages@v1
